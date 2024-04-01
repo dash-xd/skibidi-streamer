@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skibidi Streamer</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        /* Adjustments for better layout */
+        #control-feed {
+            min-width: 200px; /* Adjust as needed */
+        }
+        #middle-feed {
+            width: 45%; /* Adjust as needed */
+        }
+        #right-feed {
+            width: 45%; /* Adjust as needed */
+        }
+        .audio-tile {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .audio-tile audio {
+            width: 100%;
+        }
+        .audio-tile button {
+            margin-left: 10px;
+            cursor: pointer;
+        }
+        .youtube-tile {
+            position: relative;
+            margin-bottom: 20px; /* Increased space between video and controls */
+        }
+
+        .youtube-tile iframe {
+            width: 100%;
+            height: 200px;
+        }
+
+        .profile-section {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px;
+            border-bottom: 1px solid #ccc;
+            margin-bottom: 10px;
+        }
+        .profile-section input[type="file"] {
+            display: none;
+        }
+        .profile-section img {
+            width: 250px;
+            height: 250px;
+            border-radius: 50%;
+            object-fit: cover;
+            cursor: pointer;
+        }
+        #profile-pic-container {
+            width: 250px;
+            height: 250px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        /* Theater mode styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+    position: relative;
+    width: 100%; /* Adjust width as needed */
+    height: 100%; /* Adjust height as needed */
+    max-width: 1280px; /* Max width for larger screens */
+    max-height: 720px; /* Max height for larger screens */
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+#theaterVideo {
+    margin-top: 20px; /* Add margin above the iframe */
+    width: 100%; /* Set the width to 100% to make the video fill the modal */
+    height: 200%;
+}
+
+.tts-input-section {
+    margin-top: 20px;
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column; /* Adjust to column layout */
+    align-items: center; /* Center horizontally */
+}
+
+.tts-input-section button {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    background-color: #3182ce;
+    color: white;
+    padding: 10px 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    display: flex;
+    align-items: center; /* Center vertically */
+}
+
+.tts-input-section button img {
+    margin-left: 5px; /* Add some space between the "Talk" text and the profile picture */
+}
+
+
+        .modal-close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            color: white;
+            cursor: pointer;
+        }
+
+        .modal-textarea {
+            width: 80%;
+            height: 100px;
+            margin-top: 20px;
+            resize: none;
+        }
+
+        .modal-tts-btn {
+            margin-top: 20px;
+            background-color: #3182ce;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100">
+
+    <div class="flex justify-between max-w-7xl mx-auto p-4">
+        <div id="control-feed" class="h-screen overflow-y-auto bg-gray-200 p-4">
+            <h2 class="text-xl font-semibold mb-4">Skibidi Streamer</h2>
+            <div class="profile-section">
+                <div id="profile-pic-container">
+                    <input type="file" id="profilePicInput" accept="image/*">
+                    <img id="profilePic" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSv4mUjJ9qhgO3-HWhLZRo-Il80IIDB26GS2Q&usqp=CAU" alt="Profile Picture">
+                </div>
+            </div>
+            <div>
+                <label for="textInput">Text to Speech:</label>
+                <textarea id="textInput" class="block w-full mb-2 h-24"></textarea>
+                <button id="ttsBtn" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2  mr-2 rounded">Talk</button>
+                <input type="checkbox" id="playCheckbox" class="mr-1" checked> <!-- Play checkbox checked by default -->
+                <label for="playCheckbox"  class="mr-2">Play</label>
+                <input type="checkbox" id="saveCheckbox" class="mr-1">
+                <label for="saveCheckbox">Save</label>
+            </div>
+            <hr class="my-4">
+            <div>
+                <label for="youtubeInput">Enter YouTube Links:</label>
+                <textarea id="youtubeInput" class="block w-full mb-2 h-32"></textarea>
+                <button id="addVideosBtn" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">Add Videos</button>
+                <button id="clearVideosBtn" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded ml-2">Clear</button>
+                <div class="mt-2">
+                    <input type="checkbox" id="hoverModalCheckbox" class="mr-1">
+                    <label for="hoverModalCheckbox">Disable Theater Mode on Hover</label>
+                </div>
+            </div>
+            
+            <hr class="my-4">
+            <div>
+                <label for="audioInput">Upload Audio Files:</label>
+                <input id="audioInput" type="file" multiple class="block w-full mb-2">
+            </div>
+        </div>
+        <div id="middle-feed" class="h-screen overflow-y-auto bg-gray-300 p-4"></div>
+        <div id="right-feed" class="h-screen overflow-y-auto bg-gray-400 p-4"></div>
+    </div>
+
+<!-- Theater mode modal overlay -->
+<div id="theaterModal" class="modal-overlay" tabindex="-1" aria-labelledby="theaterModalLabel" aria-hidden="true">
+    <div class="modal-content">
+        <span class="modal-close" onclick="closeTheaterModal()">X</span>
+        <!-- Theater mode video iframe -->
+        <iframe id="theaterVideo" width="560" height="315" frameborder="0" allowfullscreen></iframe>
+        <!-- TTS input section -->
+        <div class="tts-input-section">
+            <label for="modalTextInput"></label>
+            <textarea id="modalTextInput" class="block w-full mb-2 h-24"></textarea>
+            <button id="modalTTSBtn" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 mr-2 rounded">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSv4mUjJ9qhgO3-HWhLZRo-Il80IIDB26GS2Q&usqp=CAU" alt="Profile Picture" class="h-6 w-6 rounded-full ml-2">
+                &nbsp; &nbsp;
+                <span>Talk</span>
+            </button>
+        </div>
+    </div>
+    </div>
+</div>
+
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {             const addVideosBtn = document.getElementById("addVideosBtn");
+            const clearVideosBtn = document.getElementById("clearVideosBtn");
+            const audioInput = document.getElementById("audioInput");
+            const ttsBtn = document.getElementById("ttsBtn");
+            const profilePicContainer = document.getElementById("profile-pic-container");
+
+            const hoverModalCheckbox = document.getElementById("hoverModalCheckbox");
+        hoverModalCheckbox.addEventListener("change", function () {
+            const isChecked = this.checked;
+
+            // Update the function to add or remove event listeners based on the checkbox state
+            function toggleHoverMode(tile) {
+                if (isChecked) {
+                    tile.addEventListener("mouseover", showTheaterMode);
+                } else {
+                    tile.removeEventListener("mouseover", showTheaterMode);
+                }
+            }
+
+            // Add or remove event listeners for existing YouTube tiles
+            const youtubeTiles = document.querySelectorAll('.youtube-tile');
+            youtubeTiles.forEach(toggleHoverMode);
+
+            // Listen for changes in the DOM and apply event listeners to new YouTube tiles
+            const middleFeed = document.getElementById("middle-feed");
+            const observer = new MutationObserver(function (mutations) {
+                mutations.forEach(function (mutation) {
+                    mutation.addedNodes.forEach(function (node) {
+                        if (node.classList && node.classList.contains('youtube-tile')) {
+                            toggleHoverMode(node);
+                        }
+                    });
+                });
+            });
+            observer.observe(middleFeed, { childList: true });
+        });
+
+             // Event listener for TTS "Talk" button inside the theater modal
+             document.getElementById('modalTTSBtn').addEventListener('click', function () {
+                const text = document.getElementById('modalTextInput').value;
+                const playCheckbox = document.getElementById('playCheckbox').checked;
+                const saveCheckbox = document.getElementById('saveCheckbox').checked;
+
+                if (playCheckbox && saveCheckbox) {
+                    // If both "Play" and "Save" checkboxes are checked
+                    // Play the audio and append the message to the chat feed
+                    fetchTextToSpeech(text, saveCheckbox, playCheckbox, function (audioSrc) {
+                        appendChatMessage(text);
+                    });
+                } else {
+                    fetchTextToSpeech(text, saveCheckbox, playCheckbox);
+                }
+            });
+            
+            let i = 0
+            // Listen for Enter key press in the TTS input field inside the theater modal
+            document.getElementById("modalTextInput").addEventListener("keydown", function (event) {
+                if (event.key === "Enter") {
+                    i = i + 1
+                    if (i < 1 ) {
+                        event.preventDefault(); // Prevent the default Enter key behavior (e.g., new line)
+                        document.getElementById('modalTTSBtn').click(); // Trigger the click event on the Talk button
+                    }
+                    i = i - 1;
+                }
+            });
+            
+
+
+            addVideosBtn.addEventListener("click", function () {
+                const youtubeLinks = document.getElementById("youtubeInput").value.split("\n").filter(link => link.trim() !== "");
+                embedYouTubeVideos(youtubeLinks);
+            });
+
+            clearVideosBtn.addEventListener("click", function () {
+                const middleFeed = document.getElementById("middle-feed");
+                middleFeed.innerHTML = ""; // Clear the middle feed
+            });
+
+            audioInput.addEventListener("change", function () {
+                const audioFiles = Array.from(audioInput.files);
+                displayAudioFiles(audioFiles);
+            });
+
+            document.addEventListener("keydown", function (event) {
+                if (event.key === "Escape") {
+                    closeTheaterModal();
+                }
+            });
+
+            document.addEventListener("click", function (event) {
+                const theaterModal = document.getElementById('theaterModal');
+                const theaterContent = document.querySelector('.modal-content');
+
+                // Check if the clicked element is outside of the theater modal content
+                if (!theaterContent.contains(event.target)) {
+                    closeTheaterModal();
+                }
+            });
+
+            ttsBtn.addEventListener("click", function () {
+                const text = document.getElementById("textInput").value;
+                const saveCheckbox = document.getElementById("saveCheckbox").checked;
+                const playCheckbox = document.getElementById("playCheckbox").checked;
+                fetchTextToSpeech(text, saveCheckbox, playCheckbox);
+            });
+
+            profilePicContainer.addEventListener("click", function () {
+                document.getElementById("profilePicInput").click();
+            });
+
+            document.getElementById("profilePicInput").addEventListener("change", function (event) {
+                const file = event.target.files[0];
+                const reader = new FileReader();
+                reader.onload = function () {
+                    document.getElementById("profilePic").src = reader.result;
+                };
+                reader.readAsDataURL(file);
+            });
+
+            // Listen for Enter key press in the text input field
+            document.getElementById("textInput").addEventListener("keydown", function (event) {
+                if (event.key === "Enter") {
+                    event.preventDefault(); // Prevent the default Enter key behavior (e.g., new line)
+                    ttsBtn.click(); // Trigger the click event on the Talk button
+                }
+            });
+
+            // Listen for Enter key press in the modal text input field
+            document.getElementById("modalTextInput").addEventListener("keydown", function (event) {
+                if (event.key === "Enter") {
+                    event.preventDefault(); // Prevent the default Enter key behavior (e.g., new line)
+                    submitModalTextToSpeech(); // Call the function to submit text to speech from modal
+                }
+            });
+        });
+
+        function embedYouTubeVideos(links) {
+            const middleFeed = document.getElementById("middle-feed");
+
+            links.forEach(link => {
+                let videoId;
+                if (link.includes("youtube.com/shorts/")) {
+                    // For YouTube shorts
+                    videoId = link.split("youtube.com/shorts/")[1];
+                    const embedCode = createYouTubeTile(videoId);
+                    middleFeed.insertAdjacentHTML("beforeend", embedCode);
+                } else {
+                    // For regular YouTube videos
+                    videoId = getYouTubeVideoId(link);
+
+                    if (videoId) {
+                        const embedCode = createYouTubeTile(videoId);
+                        middleFeed.insertAdjacentHTML("beforeend", embedCode);
+                    }
+                }
+            });
+        }
+
+        function createYouTubeTile(videoId) {
+            return `
+                <div class="youtube-tile" onmouseover="showTheaterMode(this)">
+                    <iframe width="100%" height="100%" src="https://www.youtube.com/embed/${videoId}" frameborder="0" allowfullscreen></iframe>
+                </div>
+            `;
+        }
+
+        function getYouTubeVideoId(url) {
+            const regex = /[?&]([^=#]+)=([^&#]*)/g;
+            let match;
+            while ((match = regex.exec(url))) {
+                if (match[1] === "v") {
+                    return match[2];
+                }
+            }
+            return null;
+        }
+
+        function displayAudioFiles(files) {
+            const rightFeed = document.getElementById("right-feed");
+
+            files.forEach(file => {
+                const audioTile = createAudioTile(file.name, URL.createObjectURL(file));
+                rightFeed.appendChild(audioTile);
+            });
+        }
+
+        function fetchTextToSpeech(text, save, play) {
+            const saveCheckbox = document.getElementById("saveCheckbox");
+            const playCheckbox = document.getElementById("playCheckbox");
+
+            if (!save && !play) {
+                alert("Please select at least one option:Save or Play.");
+                return;
+            }
+
+            const audioElement = document.createElement("audio");
+            audioElement.controls = true;
+            audioElement.autoplay = playCheckbox.checked;
+
+            const sourceElement = document.createElement("source");
+            sourceElement.src = `http://tts.cyzon.us/tts?text=${encodeURIComponent(text)}`;
+            sourceElement.type = "audio/mpeg";
+            audioElement.appendChild(sourceElement);
+
+            if (!saveCheckbox.checked) {
+                // If "Save" is not selected, manually remove the audio element after it finishes playing
+                audioElement.addEventListener("ended", function () {
+                    this.remove(); // Remove the audio element from the DOM after it finishes playing
+                });
+            } else {
+                // If "Save" is selected, append the audio element to the right feed
+                const audioTile = createAudioTile(text.substring(0, 50), sourceElement.src);
+                const rightFeed = document.getElementById("right-feed");
+                rightFeed.appendChild(audioTile);
+            }
+        }
+
+        function createAudioTile(title, audioSrc) {
+            const audioElement = document.createElement("audio");
+            audioElement.src = audioSrc;
+            audioElement.controls = true;
+
+            const closeButton = document.createElement("button");
+            closeButton.textContent = "x";
+            closeButton.addEventListener("click", function () {
+                const audioTile = this.parentElement;
+                audioTile.remove();
+            });
+
+            const div = document.createElement("div");
+            div.classList.add("audio-tile");
+
+            // Create a span element to display the title
+            const titleSpan = document.createElement("span");
+            titleSpan.textContent = title.length > 50 ? `${title.substring(0, 50)}...` : title;
+            div.appendChild(titleSpan);
+            div.appendChild(audioElement);
+            div.appendChild(closeButton);
+
+            return div;
+        }
+
+        let timer; // Variable to store the timer for delay
+        let hoverDelay = 500 * 4; // Delay of 500 milliseconds
+
+        function showTheaterMode(videoTile) {
+            // Clear existing timer
+            clearTimeout(timer);
+
+            // Set a new timer for delay before showing the theater mode
+            timer = setTimeout(() => {
+                const videoFrame = videoTile.querySelector('iframe');
+                const theaterModal = document.getElementById('theaterModal');
+                const theaterVideo = document.getElementById('theaterVideo');
+                const modalTextInput = document.getElementById('modalTextInput'); // Added to access the modal text input
+
+                // Set the source of the theater mode video
+                theaterVideo.src = videoFrame.src;
+
+                // Show the theater mode modal overlay
+                theaterModal.style.display = 'flex';
+
+                // Focus on the text input in the modal
+                modalTextInput.focus();
+            }, hoverDelay); // Set the timer using the hover delay
+
+            // Reset the timer if the user moves their mouse away from the video
+            videoTile.addEventListener("mouseleave", function () {
+                clearTimeout(timer);
+            });
+        }
+
+        function closeTheaterModal() {
+            const theaterModal = document.getElementById('theaterModal');
+            const theaterVideo = document.getElementById('theaterVideo');
+
+            // Hide the theater mode modal overlay
+            theaterModal.style.display = 'none';
+
+            // Pause the theater mode video
+            theaterVideo.src = '';
+        }
+
+        function submitModalTextToSpeech() {
+            const modalTextInput = document.getElementById('modalTextInput').value;
+            fetchTextToSpeech(modalTextInput, true, true);
+        }
+    </script>
+</body>
+</html>
