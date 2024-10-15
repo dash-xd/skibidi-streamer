@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skibidi Streamer</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        /* Adjustments for better layout */
+        #control-feed {
+            min-width: 200px; /* Adjust as needed */
+        }
+        #middle-feed {
+            width: 45%; /* Adjust as needed */
+        }
+        #right-feed {
+            width: 45%; /* Adjust as needed */
+        }
+        .audio-tile {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .audio-tile audio {
+            width: 100%;
+        }
+        .audio-tile button {
+            margin-left: 10px;
+            cursor: pointer;
+        }
+        .youtube-tile {
+            position: relative;
+            margin-bottom: 20px; /* Increased space between video and controls */
+        }
+
+        .youtube-tile iframe {
+            width: 100%;
+            height: 200px;
+        }
+
+        .profile-section {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px;
+            border-bottom: 1px solid #ccc;
+            margin-bottom: 10px;
+        }
+        .profile-section input[type="file"] {
+            display: none;
+        }
+        .profile-section img {
+            width: 250px;
+            height: 250px;
+            border-radius: 50%;
+            object-fit: cover;
+            cursor: pointer;
+        }
+        #profile-pic-container {
+            width: 250px;
+            height: 250px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        /* Theater mode styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            max-width: 1280px;
+            max-height: 720px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #theaterVideo {
+            margin-top: 20px;
+            width: 100%;
+            height: 200%;
+        }
+
+        .tts-input-section {
+            margin-top: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .tts-input-section button {
+            margin-top: 10px;
+            margin-bottom: 10px;
+            background-color: #3182ce;
+            color: white;
+            padding: 10px 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+
+        .tts-input-section button img {
+            margin-left: 5px;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            color: white;
+            cursor: pointer;
+        }
+
+        .modal-textarea {
+            width: 80%;
+            height: 100px;
+            margin-top: 20px;
+            resize: none;
+        }
+
+        .modal-tts-btn {
+            margin-top: 20px;
+            background-color: #3182ce;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        /* Dark theme styling */
+        body.dark-theme {
+            background-color: #03040b; /* Dark grey background */
+            color: #d4af37; /* Washed-out gold color for text */
+        }
+        .dark-theme #control-feed, 
+        .dark-theme #middle-feed, 
+        .dark-theme #right-feed {
+            background-color: #03040b; /* Slightly lighter grey for sections */
+        }
+        .dark-theme textarea, 
+        .dark-theme input[type="file"], 
+        .dark-theme input[type="checkbox"], 
+        .dark-theme button {
+            background-color: #2f2f2f; /* Dark grey for inputs */
+            color: #d4af37; /* Washed-out gold color for text */
+            border-color: #d4af37; /* Gold border for inputs */
+        }
+        .dark-theme button:hover {
+            background-color: #444444; /* Slightly lighter grey on hover */
+        }
+        .dark-theme .modal-overlay {
+            background-color: rgba(0, 0, 0, 0.8); /* Darker overlay for theater mode */
+        }
+        .dark-theme .modal-content {
+            background-color: #03040b; /* Modal background color */
+        }
+        .dark-theme .modal-close {
+            color: #d4af37; /* Close button color */
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100 dark-theme"> <!-- Apply the dark theme class here -->
+
+    <div class="flex justify-between max-w-7xl mx-auto p-4">
+        <div id="control-feed" class="h-screen overflow-y-auto p-4">
+            <h2 class="text-xl font-semibold mb-4">Skibidi Streamer</h2>
+            <div class="profile-section">
+                <div id="profile-pic-container">
+                    <input type="file" id="profilePicInput" accept="image/*">
+                    <img id="profilePic" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSv4mUjJ9qhgO3-HWhLZRo-Il80IIDB26GS2Q&usqp=CAU" alt="Profile Picture">
+                </div>
+            </div>
+            <div>
+                <label for="textInput">Text to Speech:</label>
+                <textarea id="textInput" class="block w-full mb-2 h-24"></textarea>
+                <button id="ttsBtn" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2  mr-2 rounded">Talk</button>
+                <input type="checkbox" id="playCheckbox" class="mr-1" checked>
+                <label for="playCheckbox" class="mr-2">Play</label>
+                <input type="checkbox" id="saveCheckbox" class="mr-1">
+                <label for="saveCheckbox">Save</label>
+            </div>
+            <hr class="my-4">
+            <div>
+                <label for="youtubeInput">Enter YouTube Links:</label>
+                <textarea id="youtubeInput" class="block w-full mb-2 h-32"></textarea>
+                <button id="addVideosBtn" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">Add Videos</button>
+                <button id="clearVideosBtn" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded ml-2">Clear</button>
+                <div class="mt-2">
+                    <input type="checkbox" id="hoverModalCheckbox" class="mr-1">
+                    <label for="hoverModalCheckbox">Disable Theater Mode on Hover</label>
+                </div>
+            </div>
+
+            <hr class="my-4">
+            <div>
+                <label for="audioInput">Upload Audio Files:</label>
+                <input id="audioInput" type="file" multiple class="block w-full mb-2">
+            </div>
+        </div>
+        <div id="middle-feed" class="h-screen overflow-y-auto p-4"></div>
+        <div id="right-feed" class="h-screen overflow-y-auto p-4"></div>
+    </div>
+
+    <!-- Theater mode modal overlay -->
+    <div id="theaterModal" class="modal-overlay" tabindex="-1" aria-labelledby="theaterModalLabel" aria-hidden="true">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeTheaterModal()">X</span>
+            <!-- Theater mode video iframe -->
+            <iframe id="theaterVideo" width="560" height="315" frameborder="0" allowfullscreen></iframe>
+            <!-- TTS input section -->
+            <div class="tts-input-section">
+                <textarea id="modalTextInput" class="block w-full mb-2 h-24"></textarea>
+                <button id="modalTTSBtn" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 mr-2 rounded">
+                    <img id="modalProfilePic" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSv4mUjJ9qhgO3-HWhLZRo-Il80IIDB26GS2Q&usqp=CAU" alt="Profile Picture" class="w-10 h-10 rounded-full mr-2">
+                    Talk
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+       document.addEventListener("DOMContentLoaded", function () {
+    const addVideosBtn = document.getElementById("addVideosBtn");
+    const clearVideosBtn = document.getElementById("clearVideosBtn");
+    const audioInput = document.getElementById("audioInput");
+    const ttsBtn = document.getElementById("ttsBtn");
+    const profilePicContainer = document.getElementById("profile-pic-container");
+    const hoverModalCheckbox = document.getElementById("hoverModalCheckbox");
+
+    // Toggle hover mode functionality
+    hoverModalCheckbox.addEventListener("change", function () {
+        const isChecked = this.checked;
+
+        function toggleHoverMode(tile) {
+            if (isChecked) {
+                tile.addEventListener("mouseover", showTheaterMode);
+            } else {
+                tile.removeEventListener("mouseover", showTheaterMode);
+            }
+        }
+
+        // Add/remove event listeners for existing YouTube tiles
+        const youtubeTiles = document.querySelectorAll('.youtube-tile');
+        youtubeTiles.forEach(toggleHoverMode);
+
+        // Apply event listeners to new YouTube tiles dynamically
+        const middleFeed = document.getElementById("middle-feed");
+        const observer = new MutationObserver(function (mutations) {
+            mutations.forEach(function (mutation) {
+                mutation.addedNodes.forEach(function (node) {
+                    if (node.classList && node.classList.contains('youtube-tile')) {
+                        toggleHoverMode(node);
+                    }
+                });
+            });
+        });
+        observer.observe(middleFeed, { childList: true });
+    });
+
+    // Text-to-Speech in Theater Modal
+    document.getElementById('modalTTSBtn').addEventListener('click', function () {
+        const text = document.getElementById('modalTextInput').value;
+        const playCheckbox = document.getElementById('playCheckbox').checked;
+        const saveCheckbox = document.getElementById('saveCheckbox').checked;
+
+        fetchTextToSpeech(text, saveCheckbox, playCheckbox, function (audioSrc) {
+            if (playCheckbox && saveCheckbox) {
+                appendChatMessage(text);
+            }
+        });
+    });
+
+    // Keydown listener for modal TTS input
+    document.getElementById("modalTextInput").addEventListener("keydown", function (event) {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            document.getElementById('modalTTSBtn').click();
+        }
+    });
+
+    // Add videos on button click
+    addVideosBtn.addEventListener("click", function () {
+        const youtubeLinks = document.getElementById("youtubeInput").value.split("\n").filter(link => link.trim() !== "");
+        embedYouTubeVideos(youtubeLinks);
+    });
+
+    // Clear video feed
+    clearVideosBtn.addEventListener("click", function () {
+        document.getElementById("middle-feed").innerHTML = ""; // Clear feed
+    });
+
+    // Display selected audio files
+    audioInput.addEventListener("change", function () {
+        const audioFiles = Array.from(audioInput.files);
+        displayAudioFiles(audioFiles);
+    });
+
+    // Escape key to close theater modal
+    document.addEventListener("keydown", function (event) {
+        if (event.key === "Escape") {
+            closeTheaterModal();
+        }
+    });
+
+    // Close theater modal if clicked outside the modal content
+    document.addEventListener("click", function (event) {
+        const theaterModal = document.getElementById('theaterModal');
+        const theaterContent = document.querySelector('.modal-content');
+        if (!theaterContent.contains(event.target)) {
+            closeTheaterModal();
+        }
+    });
+
+    // TTS button event
+    ttsBtn.addEventListener("click", function () {
+        const text = document.getElementById("textInput").value;
+        const saveCheckbox = document.getElementById("saveCheckbox").checked;
+        const playCheckbox = document.getElementById("playCheckbox").checked;
+        fetchTextToSpeech(text, saveCheckbox, playCheckbox);
+    });
+
+    // Profile picture upload functionality
+    profilePicContainer.addEventListener("click", function () {
+        document.getElementById("profilePicInput").click();
+    });
+
+    document.getElementById("profilePicInput").addEventListener("change", function (event) {
+        const file = event.target.files[0];
+        const reader = new FileReader();
+        reader.onload = function () {
+            document.getElementById("profilePic").src = reader.result;
+        };
+        reader.readAsDataURL(file);
+    });
+
+    // Enter key TTS submission for main text input
+    document.getElementById("textInput").addEventListener("keydown", function (event) {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            ttsBtn.click();
+        }
+    });
+});
+
+// Video Embedding
+function embedYouTubeVideos(links) {
+    const middleFeed = document.getElementById("middle-feed");
+
+    links.forEach(link => {
+        let videoId;
+        if (link.includes("youtube.com/shorts/")) {
+            videoId = link.split("youtube.com/shorts/")[1];
+        } else {
+            videoId = getYouTubeVideoId(link);
+        }
+
+        if (videoId) {
+            const embedCode = createYouTubeTile(videoId);
+            middleFeed.insertAdjacentHTML("beforeend", embedCode);
+        }
+    });
+}
+
+// Creates a YouTube video tile
+function createYouTubeTile(videoId) {
+    return `
+        <div class="youtube-tile" onmouseover="showTheaterMode(this)">
+            <iframe width="100%" height="100%" src="https://www.youtube.com/embed/${videoId}" frameborder="0" allowfullscreen></iframe>
+        </div>
+    `;
+}
+
+function getYouTubeVideoId(url) {
+    const regex = /[?&]([^=#]+)=([^&#]*)/g;
+    let match;
+    while ((match = regex.exec(url))) {
+        if (match[1] === "v") {
+            return match[2];
+        }
+    }
+    return null;
+}
+
+function displayAudioFiles(files) {
+    const rightFeed = document.getElementById("right-feed");
+
+    files.forEach(file => {
+        const audioTile = createAudioTile(file.name, URL.createObjectURL(file));
+        rightFeed.appendChild(audioTile);
+    });
+}
+
+// Fetches and plays TTS
+function fetchTextToSpeech(text, save, play, callback) {
+    if (!save && !play) {
+        alert("Please select at least one option: Save or Play.");
+        return;
+    }
+
+    const audioElement = document.createElement("audio");
+    audioElement.controls = true;
+    audioElement.autoplay = play;
+
+    const sourceElement = document.createElement("source");
+    sourceElement.src = `http://tts.cyzon.us/tts?text=${encodeURIComponent(text)}`;
+    sourceElement.type = "audio/mpeg";
+    audioElement.appendChild(sourceElement);
+
+    if (!save) {
+        audioElement.addEventListener("ended", function () {
+            this.remove();
+        });
+    } else {
+        const audioTile = createAudioTile(text.substring(0, 50), sourceElement.src);
+        document.getElementById("right-feed").appendChild(audioTile);
+    }
+
+    if (callback) {
+        callback(sourceElement.src);
+    }
+}
+
+function createAudioTile(title, audioSrc) {
+    const div = document.createElement("div");
+    div.classList.add("audio-tile");
+
+    const audioElement = document.createElement("audio");
+    audioElement.src = audioSrc;
+    audioElement.controls = true;
+
+    const closeButton = document.createElement("button");
+    closeButton.textContent = "x";
+    closeButton.addEventListener("click", function () {
+        div.remove();
+    });
+
+    const titleSpan = document.createElement("span");
+    titleSpan.textContent = title.length > 50 ? `${title.substring(0, 50)}...` : title;
+
+    div.appendChild(titleSpan);
+    div.appendChild(audioElement);
+    div.appendChild(closeButton);
+
+    return div;
+}
+
+let timer;
+let hoverDelay = 500 * 4; // Adjust the delay
+
+function showTheaterMode(videoTile) {
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+        const videoFrame = videoTile.querySelector('iframe');
+        const theaterModal = document.getElementById('theaterModal');
+        const theaterVideo = document.getElementById('theaterVideo');
+        const modalProfilePic = document.getElementById('modalProfilePic');
+        const modalTextInput = document.getElementById('modalTextInput');
+
+        theaterVideo.src = videoFrame.src;
+        modalProfilePic.src = document.getElementById("profilePic").src;
+        theaterModal.style.display = 'flex';
+        modalTextInput.focus();
+    }, hoverDelay);
+
+    videoTile.addEventListener("mouseleave", function () {
+        clearTimeout(timer);
+    });
+}
+
+function closeTheaterModal() {
+    const theaterModal = document.getElementById('theaterModal');
+    const theaterVideo = document.getElementById('theaterVideo');
+
+    theaterModal.style.display = 'none';
+    theaterVideo.src = '';
+}
+
+function submitModalTextToSpeech() {
+    const modalTextInput = document.getElementById('modalTextInput').value;
+    fetchTextToSpeech(modalTextInput, true, true, null);
+}
+    </script>
+</body>
+
+</html>
