@@ -1,0 +1,35 @@
+body.dark-theme {
+    background-color: #03040b;
+    color: #d4af37;
+}
+
+.dark-theme #control-feed,
+.dark-theme #middle-feed,
+.dark-theme #right-feed {
+    background-color: #03040b;
+}
+
+.dark-theme textarea,
+.dark-theme input[type="file"],
+.dark-theme input[type="checkbox"],
+.dark-theme button {
+    background-color: #2f2f2f;
+    color: #d4af37;
+    border-color: #d4af37;
+}
+
+.dark-theme button:hover {
+    background-color: #444444;
+}
+
+.dark-theme .modal-overlay {
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+.dark-theme .modal-content {
+    background-color: #03040b;
+}
+
+.dark-theme .modal-close {
+    color: #d4af37;
+}

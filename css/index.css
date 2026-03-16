@@ -1,0 +1,141 @@
+/* Shared layout */
+#control-feed {
+	min-width: 200px;
+	background-color: #e5e7eb;
+}
+
+#middle-feed {
+	width: 45%;
+	background-color: #d1d5db;
+}
+
+#right-feed {
+	width: 45%;
+	background-color: #9ca3af;
+}
+
+.audio-tile {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 6px;
+	margin-bottom: 10px;
+}
+
+.audio-tile audio {
+	width: 100%;
+}
+
+.audio-tile button {
+	margin-left: 10px;
+	cursor: pointer;
+}
+
+.youtube-tile {
+	position: relative;
+	margin-bottom: 20px;
+}
+
+.youtube-tile iframe {
+	width: 100%;
+	height: 200px;
+}
+
+.profile-section {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 10px;
+	border-bottom: 1px solid #ccc;
+	margin-bottom: 10px;
+}
+
+.profile-section input[type="file"] {
+	display: none;
+}
+
+.profile-section img {
+	width: 250px;
+	height: 250px;
+	border-radius: 50%;
+	object-fit: cover;
+	cursor: pointer;
+}
+
+#profile-pic-container {
+	width: 250px;
+	height: 250px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	cursor: pointer;
+}
+
+/* Theater mode */
+.modal-overlay {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(0, 0, 0, 0.5);
+	z-index: 9999;
+	display: none;
+	align-items: center;
+	justify-content: center;
+}
+
+.modal-content {
+	position: relative;
+	width: 100%;
+	height: 100%;
+	max-width: 1280px;
+	max-height: 720px;
+	overflow: hidden;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+}
+
+#theaterVideo {
+	margin-top: 20px;
+	width: 100%;
+	height: 200%;
+}
+
+.tts-input-section {
+	margin-top: 20px;
+	margin-bottom: 20px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.tts-input-section button {
+	margin-top: 10px;
+	margin-bottom: 10px;
+	background-color: #3182ce;
+	color: white;
+	padding: 10px 10px;
+	border: none;
+	border-radius: 5px;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+}
+
+.tts-input-section button img {
+	margin-left: 5px;
+}
+
+.modal-close {
+	position: absolute;
+	top: 10px;
+	right: 10px;
+	color: white;
+	cursor: pointer;
+	background: transparent;
+	border: none;
+	font-size: 20px;
+}
