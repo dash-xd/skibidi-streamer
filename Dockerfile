@@ -47,5 +47,4 @@ SHELL ["/bin/bash", "-c"]
 
 # Make sure nix.sh is loaded for entrypoint
 ENV BASH_ENV=$HOME/.nix-profile/etc/profile.d/nix.sh
-
-ENTRYPOINT ["/home/nixuser/entrypoint.sh"]
+ENTRYPOINT ["/bin/bash", "/home/nixuser/entrypoint.sh"]
