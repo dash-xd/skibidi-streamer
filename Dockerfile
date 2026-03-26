@@ -16,7 +16,7 @@ ENV USER=nixuser
 ENV PATH="/home/nixuser/.nix-profile/bin:${PATH}"
 
 # Install Nix package manager
-RUN curl -sL https://nixos.org/nix/install | sh -s -- --no-daemon
+RUN curl -sL https://releases.nixos.org/nix/nix-2.34.3/install | sh -s -- --no-daemon
 
 # Ensure the environment variables are set by sourcing the nix profile
 RUN echo ". /home/nixuser/.nix-profile/etc/profile.d/nix.sh" >> /home/nixuser/.bashrc
