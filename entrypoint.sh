@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 set -e
-export PATH=$HOME/.nix-profile/bin:$PATH
 CMD=${ENTRYPOINT:-"wrangler dev"}
-echo "Running command: $CMD"
-exec $CMD
+echo "Entering Nix dev shell and running: $CMD"
+exec nix develop . --command $CMD
