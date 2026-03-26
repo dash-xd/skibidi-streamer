@@ -8,8 +8,11 @@ RUN apt-get update && apt-get install -y \
     ca-certificates curl xz-utils git bash gnupg \
  && rm -rf /var/lib/apt/lists/*
 
-# Create non-root user
-RUN useradd -m -s /bin/bash nixuser
+# Create non-root user 
+RUN useradd -m -s /bin/bash nixuser 
+COPY entrypoint.sh /home/nixuser/entrypoint.sh 
+RUN chmod +x /home/nixuser/entrypoint.sh \ 
+    && chown nixuser:nixuser /home/nixuser/entrypoint.sh
 
 USER nixuser
 ENV HOME=/home/nixuser
@@ -31,9 +34,6 @@ RUN mkdir -p $HOME/.config/nix \
  && echo "experimental-features = nix-command flakes" > $HOME/.config/nix/nix.conf \
  && echo "build-users-group =" >> $HOME/.config/nix/nix.conf
 
-# Copy entrypoint
-COPY entrypoint.sh $HOME/entrypoint.sh
-RUN chmod +x $HOME/entrypoint.sh
 
 # Source nix.sh so entrypoint can see Nix
 SHELL ["/bin/bash", "-c"]
