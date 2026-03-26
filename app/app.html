@@ -206,16 +206,13 @@
             <label for="modalTextInput"></label>
             <textarea id="modalTextInput" class="block w-full mb-2 h-24"></textarea>
             <button id="modalTTSBtn" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 mr-2 rounded">
-                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSv4mUjJ9qhgO3-HWhLZRo-Il80IIDB26GS2Q&usqp=CAU" alt="Profile Picture" class="h-6 w-6 rounded-full ml-2">
+                <img id="modalProfilePic" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSv4mUjJ9qhgO3-HWhLZRo-Il80IIDB26GS2Q&usqp=CAU" alt="Profile Picture" class="h-6 w-6 rounded-full ml-2">
                 &nbsp; &nbsp;
                 <span>Talk</span>
             </button>
         </div>
     </div>
-    </div>
 </div>
-
-
     <script>
         document.addEventListener("DOMContentLoaded", function () {             const addVideosBtn = document.getElementById("addVideosBtn");
             const clearVideosBtn = document.getElementById("clearVideosBtn");
@@ -472,10 +469,14 @@
                 const videoFrame = videoTile.querySelector('iframe');
                 const theaterModal = document.getElementById('theaterModal');
                 const theaterVideo = document.getElementById('theaterVideo');
+                const modalProfilePic = document.getElementById('modalProfilePic'); // Get the modal profile picture element
                 const modalTextInput = document.getElementById('modalTextInput'); // Added to access the modal text input
 
                 // Set the source of the theater mode video
                 theaterVideo.src = videoFrame.src;
+
+                // Set the source of the modal profile picture to the source of the profile picture
+                modalProfilePic.src = document.getElementById("profilePic").src;
 
                 // Show the theater mode modal overlay
                 theaterModal.style.display = 'flex';
@@ -489,6 +490,7 @@
                 clearTimeout(timer);
             });
         }
+
 
         function closeTheaterModal() {
             const theaterModal = document.getElementById('theaterModal');
