@@ -7,14 +7,16 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y \
     ca-certificates curl xz-utils git bash \
  && rm -rf /var/lib/apt/lists/*
+ 
+# Create user
+RUN useradd -m -s /bin/bash nixuser
 
  # Copy the entrypoint as root
 COPY entrypoint.sh /home/nixuser/entrypoint.sh
 RUN chmod +x /home/nixuser/entrypoint.sh \
  && chown nixuser:nixuser /home/nixuser/entrypoint.sh
 
-# Create user
-RUN useradd -m -s /bin/bash nixuser
+
 USER nixuser
 ENV HOME=/home/nixuser
 WORKDIR /workspace
