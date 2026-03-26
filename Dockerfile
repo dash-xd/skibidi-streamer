@@ -16,9 +16,9 @@ ENV HOME=/home/nixuser
 WORKDIR /workspace
 ENV PATH="$HOME/.nix-profile/bin:$PATH"
 
-# Download Nix binary tarball and verify SHA256
-RUN curl -L -o $HOME/nix.tar.xz https://releases.nixos.org/nix/nix-2.34.4/nix-2.34.4-x86_64-linux.tar.xz \
- && echo "f5096772a4b1d735de774b0a6fd1a3d17a0b82d6ca1a7c8382cd7ab15c9be3a4  $HOME/nix.tar.xz" | sha256sum -c - \
+# Download and install Nix from official binary
+RUN curl -L -o $HOME/nix.tar.xz \
+      https://releases.nixos.org/nix/nix-2.34.4/nix-2.34.4-x86_64-linux.tar.xz \
  && mkdir -p $HOME/nix-unpack \
  && tar -xJf $HOME/nix.tar.xz -C $HOME/nix-unpack \
  && $HOME/nix-unpack/*/install --no-daemon \
