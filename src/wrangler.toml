@@ -1,0 +1,10 @@
+"$schema" = "./node_modules/wrangler/config-schema.json"
+name = "skibidi-streamer"
+main = "src/index.js"
+compatibility_date = "2026-03-25"
+
+[env.dev]
+name = "skibidi-streamer-dev"
+  [env.staging.route]
+  pattern = "dev.skibidi.dashxd.com*"
+  zone_name = "dashxd.com"
