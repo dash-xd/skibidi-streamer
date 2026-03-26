@@ -1,0 +1,13 @@
+version: "3.9"
+
+services:
+  wrangler:
+    image: ${IMAGE_NAME:-dev-worker}:${IMAGE_TAG:-latest}
+    working_dir: /workspace
+    volumes:
+      - .:/workspace
+    environment:
+      CLOUDFLARE_API_TOKEN: ${CLOUDFLARE_API_TOKEN}
+      CLOUDFLARE_ACCOUNT_ID: ${CLOUDFLARE_ACCOUNT_ID}
+      CLOUDFLARE_KV_NAMESPACE_ID: ${CLOUDFLARE_KV_NAMESPACE_ID}
+      ENTRYPOINT: ${ENTRYPOINT:-wrangler dev}
