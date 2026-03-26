@@ -10,6 +10,9 @@ RUN apt-get update && apt-get install -y \
 
 # Create non-root user
 RUN useradd -m -s /bin/bash nixuser
+COPY entrypoint.sh /home/nixuser/entrypoint.sh 
+RUN chmod +x /home/nixuser/entrypoint.sh \ 
+    && chown nixuser:nixuser /home/nixuser/entrypoint.sh
 
 USER nixuser
 ENV HOME=/home/nixuser
@@ -32,8 +35,4 @@ RUN mkdir -p $HOME/.config/nix \
  && echo "experimental-features = nix-command flakes" > $HOME/.config/nix/nix.conf \
  && echo "build-users-group =" >> $HOME/.config/nix/nix.conf
 
-# Copy entrypoint
-COPY entrypoint.sh $HOME/entrypoint.sh
-RUN chmod +x $HOME/entrypoint.sh
-
-ENTRYPOINT ["$HOME/entrypoint.sh"]
+ENTRYPOINT ["/home/nixuser/entrypoint.sh"]
