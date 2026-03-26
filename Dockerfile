@@ -7,39 +7,31 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y \
     ca-certificates curl xz-utils git bash \
  && rm -rf /var/lib/apt/lists/*
- 
-# Create user
+
+# Create a non-root user
 RUN useradd -m -s /bin/bash nixuser
 
- # Copy the entrypoint as root
+# Copy the entrypoint as root and set ownership
 COPY entrypoint.sh /home/nixuser/entrypoint.sh
 RUN chmod +x /home/nixuser/entrypoint.sh \
  && chown nixuser:nixuser /home/nixuser/entrypoint.sh
 
-
+# Switch to non-root user
 USER nixuser
 ENV HOME=/home/nixuser
 WORKDIR /workspace
 ENV PATH="$HOME/.nix-profile/bin:$PATH"
 
 # -----------------------------
-# Deterministic Nix install
+# Official Nix install (non-daemon mode)
 # -----------------------------
-# Pin Nix version and SHA
-ENV NIX_VERSION=2.34.4
-ENV NIX_SHA256=595669eb6db6117135ca8ba6667b273eaf980a47523a92e61ed963556cd547b8
-
-# Download and extract Nix deterministically
-RUN curl -L https://releases.nixos.org/nix/nix-${NIX_VERSION}/nix-${NIX_VERSION}-x86_64-linux.tar.xz \
-    -o /tmp/nix.tar.xz \
- && echo "${NIX_SHA256}  /tmp/nix.tar.xz" | sha256sum -c - \
- && mkdir -p $HOME/.nix-profile \
- && tar -xJf /tmp/nix.tar.xz -C $HOME/.nix-profile --strip-components=1 \
- && rm /tmp/nix.tar.xz
+RUN curl -L https://nixos.org/nix/install | sh -s -- --no-daemon
 
 # Enable flakes
 RUN mkdir -p $HOME/.config/nix \
  && echo "experimental-features = nix-command flakes" > $HOME/.config/nix/nix.conf
 
-# Use it as ENTRYPOINT
+# -----------------------------
+# Entrypoint
+# -----------------------------
 ENTRYPOINT ["/home/nixuser/entrypoint.sh"]
