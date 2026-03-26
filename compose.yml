@@ -1,7 +1,8 @@
-version: "3.9"
-
 services:
   wrangler:
+    build:
+      context: .
+      dockerfile: Dockerfile
     image: ${IMAGE_NAME:-dev-worker}:${IMAGE_TAG:-latest}
     working_dir: /workspace
     volumes:
