@@ -15,6 +15,7 @@ ENV HOME=/home/nixuser
 WORKDIR /workspace
 ENV PATH="$HOME/.nix-profile/bin:$PATH"
 
+ENV NIX_INSTALLER_NO_CHECK=1
 RUN curl -L https://nixos.org/nix/install | sh -s -- --no-daemon
 
 RUN mkdir -p $HOME/.config/nix \
