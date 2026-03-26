@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 set -e
-. $HOME/.nix-profile/etc/profile.d/nix.sh
+if [ -f "$HOME/.nix-profile/etc/profile.d/nix.sh" ]; then
+    . "$HOME/.nix-profile/etc/profile.d/nix.sh"
+else
+    echo "ERROR: nix.sh not found!"
+    exit 1
+fi
 CMD=${ENTRYPOINT:-"wrangler dev"}
 echo "Entering Nix dev shell and running: $CMD"
 exec nix develop . --command $CMD
