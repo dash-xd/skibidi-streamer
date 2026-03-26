@@ -12,6 +12,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Deploy Worker via Docker Compose
+        working-directory: ${{ github.workspace }}
         run: docker compose up --build --abort-on-container-exit wrangler
         env:
           IMAGE_NAME: dev-worker
