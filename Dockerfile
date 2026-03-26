@@ -42,4 +42,4 @@ RUN mkdir -p $HOME/.config/nix \
  && echo "experimental-features = nix-command flakes" > $HOME/.config/nix/nix.conf
 
 # Use it as ENTRYPOINT
-ENTRYPOINT ["$HOME/entrypoint.sh"]
+ENTRYPOINT ["/home/nixuser/entrypoint.sh"]
