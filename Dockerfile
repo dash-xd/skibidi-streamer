@@ -34,10 +34,8 @@ RUN curl -L https://releases.nixos.org/nix/nix-${NIX_VERSION}/nix-${NIX_VERSION}
 RUN mkdir -p $HOME/.config/nix \
  && echo "experimental-features = nix-command flakes" > $HOME/.config/nix/nix.conf
 
-# -----------------------------
-# Copy entrypoint
-# -----------------------------
-COPY entrypoint.sh /usr/local/bin/entrypoint.sh
-RUN chmod +x /usr/local/bin/entrypoint.sh
+COPY entrypoint.sh $HOME/entrypoint.sh
+RUN chmod +x $HOME/entrypoint.sh
 
-ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+# Use it as ENTRYPOINT
+ENTRYPOINT ["$HOME/entrypoint.sh"]
