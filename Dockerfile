@@ -21,15 +21,6 @@ RUN curl -sL https://releases.nixos.org/nix/nix-2.34.3/install | sh -s -- --no-d
 # Ensure the environment variables are set by sourcing the nix profile
 RUN echo ". /home/nixuser/.nix-profile/etc/profile.d/nix.sh" >> /home/nixuser/.bashrc
 
-# Verify that Nix was installed
-RUN . /home/nixuser/.nix-profile/etc/profile.d/nix.sh && nix --version
-
-# Clone the repository into the dotfiles directory
-RUN git clone https://github.com/dash-xd/home.git /home/nixuser/dotfiles
-
-# Symlink everything except the .git directory into the home directory
-RUN find /home/nixuser/dotfiles -maxdepth 1 ! -name ".git" -exec ln -sf {} /home/nixuser/ \;
-
 # Change ownership of symlinked files to nixuser
 RUN chown -R nixuser:nixuser /home/nixuser/*
 
@@ -45,4 +36,4 @@ RUN chmod -R 755 /home/nixuser/.config/nix \
     && . /home/nixuser/.nix-profile/etc/profile.d/nix.sh
 
 # Default command to keep the container running for interactive use
-CMD ["/bin/bash"]
+ENTRYPOINT ["/home/nixuser/entrypoint.sh"]
