@@ -6,8 +6,8 @@ services:
     image: ${IMAGE_NAME:-dev-worker}:${IMAGE_TAG:-latest}
     working_dir: /home/nixuser/src
     volumes:
-      - ../src:/home/nixuser/src
-      - ../flakes:/home/nixuser/flakes
+      - ./src:/home/nixuser/src
+      - ./flakes:/home/nixuser/flakes
     environment:
       CLOUDFLARE_API_TOKEN: ${CLOUDFLARE_API_TOKEN}
       CLOUDFLARE_ACCOUNT_ID: ${CLOUDFLARE_ACCOUNT_ID}
