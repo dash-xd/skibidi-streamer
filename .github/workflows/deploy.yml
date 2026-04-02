@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: dev
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v6
 
       - name: Deploy Worker via Docker Compose
         working-directory: ${{ github.workspace }}
