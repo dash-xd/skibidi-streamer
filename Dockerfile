@@ -1,36 +1,40 @@
-# Use Ubuntu as the base image
 FROM ubuntu:25.04
 
-# Install required dependencies, Vim, and create the nixuser
+ENV DEBIAN_FRONTEND=noninteractive
+
 RUN apt update \
     && apt upgrade -y \
     && apt install -y ca-certificates curl xz-utils git vim \
     && /sbin/useradd -m nixuser \
     && mkdir /nix \
-    && chown nixuser /nix \
+    && chown nixuser:nixuser /nix \
     && apt clean
+
+COPY entrypoint.sh /home/nixuser/entrypoint.sh
+
+RUN chown nixuser:nixuser /home/nixuser/entrypoint.sh \
+    && chmod 755 /home/nixuser/entrypoint.sh
 
 # Switch to nixuser
 USER nixuser
 ENV USER=nixuser
 ENV PATH="/home/nixuser/.nix-profile/bin:${PATH}"
 
-# Install Nix package manager
-RUN curl -sL https://releases.nixos.org/nix/nix-2.34.3/install | sh -s -- --no-daemon
+# Install Nix
+RUN curl -sL https://releases.nixos.org/nix/nix-2.34.3/install \
+    | sh -s -- --no-daemon
 
-# Ensure the environment variables are set by sourcing the nix profile
-RUN echo ". /home/nixuser/.nix-profile/etc/profile.d/nix.sh" >> /home/nixuser/.bashrc
+# Ensure nix env loads
+RUN echo ". /home/nixuser/.nix-profile/etc/profile.d/nix.sh" \
+    >> /home/nixuser/.bashrc
 
-# Copy the pre-made nix.conf file to the nixuser's configuration directory
+# Copy config + flakes
 COPY --chown=nixuser:nixuser conf/nix.conf /home/nixuser/.config/nix/nix.conf
-
-# Copy the flakes directory into the nixuser's home directory
 COPY --chown=nixuser:nixuser flakes /home/nixuser/flakes
 
-# Ensure proper permissions and prepare the environment
+# Permissions
 RUN chmod -R 755 /home/nixuser/.config/nix \
-    && chmod -R 755 /home/nixuser/flakes \
-    && . /home/nixuser/.nix-profile/etc/profile.d/nix.sh
+    && chmod -R 755 /home/nixuser/flakes
 
-# Default command to keep the container running for interactive use
+# Entrypoint
 ENTRYPOINT ["/home/nixuser/entrypoint.sh"]
