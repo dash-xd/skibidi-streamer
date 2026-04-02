@@ -1,7 +1,7 @@
 services:
   wrangler:
     build:
-      context: ..
+      context: .
       dockerfile: Dockerfile
     image: ${IMAGE_NAME:-dev-worker}:${IMAGE_TAG:-latest}
     working_dir: /home/nixuser/src
