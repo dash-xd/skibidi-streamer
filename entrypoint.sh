@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-set -e
+set -euo pipefail
 
-# Source nix.sh
+# Load nix
 if [ -f "$HOME/.nix-profile/etc/profile.d/nix.sh" ]; then
     . "$HOME/.nix-profile/etc/profile.d/nix.sh"
 else
@@ -9,11 +9,14 @@ else
     exit 1
 fi
 
-# Explicitly export PATH just in case
 export PATH="$HOME/.nix-profile/bin:$PATH"
 
-CMD=${ENTRYPOINT:-"wrangler dev"}
-echo "Entering Nix dev shell and running: $CMD"
+# Your real app root
+cd /home/nixuser/app
 
-# Run flake development shell
-exec nix develop . --command "$CMD"
+CMD=${ENTRYPOINT:-wrangler dev}
+
+echo "Using flake: /home/nixuser/flakes"
+echo "Running: $CMD"
+
+exec nix develop /home/nixuser/flakes#default --command bash -c "$CMD"
