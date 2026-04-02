@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Load nix
 if [ -f "$HOME/.nix-profile/etc/profile.d/nix.sh" ]; then
     . "$HOME/.nix-profile/etc/profile.d/nix.sh"
 else
@@ -11,8 +10,7 @@ fi
 
 export PATH="$HOME/.nix-profile/bin:$PATH"
 
-# Your real app root
-cd /home/nixuser/app
+cd /home/nixuser/src
 
 CMD=${ENTRYPOINT:-wrangler dev}
 
