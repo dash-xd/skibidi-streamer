@@ -21,9 +21,6 @@ RUN curl -sL https://releases.nixos.org/nix/nix-2.34.3/install | sh -s -- --no-d
 # Ensure the environment variables are set by sourcing the nix profile
 RUN echo ". /home/nixuser/.nix-profile/etc/profile.d/nix.sh" >> /home/nixuser/.bashrc
 
-# Change ownership of symlinked files to nixuser
-RUN chown -R nixuser:nixuser /home/nixuser/*
-
 # Copy the pre-made nix.conf file to the nixuser's configuration directory
 COPY --chown=nixuser:nixuser conf/nix.conf /home/nixuser/.config/nix/nix.conf
 
