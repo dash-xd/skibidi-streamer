@@ -14,20 +14,22 @@
       <label for="left-url">Left</label>
       <input id="left-url" name="url" type="url" inputmode="url" autocomplete="off" spellcheck="false">
       <button type="submit">Load</button>
+      <button id="left-view-toggle" class="view-toggle" type="button" data-view="left" aria-pressed="false" title="Show only left pane">Expand</button>
     </form>
     <form class="pane-control" data-pane="right">
       <label for="right-url">Right</label>
       <input id="right-url" name="url" type="url" inputmode="url" autocomplete="off" spellcheck="false">
       <button type="submit">Load</button>
+      <button id="right-view-toggle" class="view-toggle" type="button" data-view="right" aria-pressed="false" title="Show only right pane">Expand</button>
     </form>
   </header>
 
-  <main id="workspace" class="workspace" aria-label="Split browser workspace">
-    <section class="pane">
+  <main id="workspace" class="workspace" data-view="split" aria-label="Split browser workspace">
+    <section id="left-pane" class="pane">
       <iframe id="left-frame" title="Left workspace" allow="autoplay; fullscreen; picture-in-picture; clipboard-read; clipboard-write"></iframe>
     </section>
     <div id="splitter" class="splitter" role="separator" aria-orientation="vertical" aria-label="Resize panes" tabindex="0"></div>
-    <section class="pane">
+    <section id="right-pane" class="pane">
       <iframe id="right-frame" title="Right workspace" allow="autoplay; fullscreen; picture-in-picture; clipboard-read; clipboard-write"></iframe>
     </section>
   </main>
