@@ -25,6 +25,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
+      # Keep Pages deployment limited to browser assets only.
       - name: Stage static site
         shell: bash
         run: |
