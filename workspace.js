@@ -1,6 +1,10 @@
 const workspace = document.getElementById("workspace");
 const splitter = document.getElementById("splitter");
-const defaultApp = new URL("./app/app.html", window.location.href).href;
+const defaultLeft = new URL("./app/app.html", window.location.href).href;
+const defaultRightURL = new URL("./app/app.html", window.location.href);
+defaultRightURL.searchParams.set("theme", "dark");
+const defaultRight = defaultRightURL.href;
+const darkStylesheet = new URL("./app/dark.css", window.location.href).href;
 const externalSandbox = [
   "allow-downloads",
   "allow-forms",
@@ -12,8 +16,8 @@ const externalSandbox = [
   "allow-scripts"
 ].join(" ");
 
-function normalizeURL(value) {
-  const url = new URL(value || defaultApp, window.location.href);
+function normalizeURL(value, fallback) {
+  const url = new URL(value || fallback, window.location.href);
 
   if (url.origin !== window.location.origin && url.protocol !== "https:") {
     throw new Error("External panes must use HTTPS");
@@ -22,10 +26,32 @@ function normalizeURL(value) {
   return url;
 }
 
-function loadPane(name, value, updateLocation = true) {
+function applySameOriginTheme(frame, url) {
+  if (url.origin !== window.location.origin) {
+    return;
+  }
+
+  const document = frame.contentDocument;
+  const dark = url.searchParams.get("theme") === "dark";
+  let stylesheet = document.getElementById("workspace-dark-theme");
+
+  if (dark && !stylesheet) {
+    stylesheet = document.createElement("link");
+    stylesheet.id = "workspace-dark-theme";
+    stylesheet.rel = "stylesheet";
+    stylesheet.href = darkStylesheet;
+    document.head.appendChild(stylesheet);
+  } else if (!dark && stylesheet) {
+    stylesheet.remove();
+  }
+
+  document.body.classList.toggle("dark-theme", dark);
+}
+
+function loadPane(name, value, fallback, updateLocation = true) {
   const frame = document.getElementById(`${name}-frame`);
   const input = document.getElementById(`${name}-url`);
-  const url = normalizeURL(value);
+  const url = normalizeURL(value, fallback);
 
   if (url.origin === window.location.origin) {
     frame.removeAttribute("sandbox");
@@ -34,6 +60,7 @@ function loadPane(name, value, updateLocation = true) {
   }
 
   frame.referrerPolicy = "strict-origin-when-cross-origin";
+  frame.onload = () => applySameOriginTheme(frame, url);
   frame.src = url.href;
   input.value = url.href;
 
@@ -48,9 +75,10 @@ for (const form of document.querySelectorAll(".pane-control")) {
   form.addEventListener("submit", event => {
     event.preventDefault();
     const name = form.dataset.pane;
+    const fallback = name === "left" ? defaultLeft : defaultRight;
 
     try {
-      loadPane(name, new FormData(form).get("url"));
+      loadPane(name, new FormData(form).get("url"), fallback);
     } catch (error) {
       window.alert(error.message);
     }
@@ -58,8 +86,8 @@ for (const form of document.querySelectorAll(".pane-control")) {
 }
 
 const initialParams = new URLSearchParams(window.location.search);
-loadPane("left", initialParams.get("left") || defaultApp, false);
-loadPane("right", initialParams.get("right") || defaultApp, false);
+loadPane("left", initialParams.get("left"), defaultLeft, false);
+loadPane("right", initialParams.get("right"), defaultRight, false);
 
 function setSplit(clientX) {
   const rect = workspace.getBoundingClientRect();
