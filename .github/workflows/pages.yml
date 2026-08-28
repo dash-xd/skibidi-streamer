@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - iframe-workspace
+    paths:
+      - .github/dispatch/pages
   workflow_dispatch:
 
 permissions:
