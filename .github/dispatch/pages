@@ -1,0 +1,7 @@
+# GitHub Pages pseudo-dispatch marker
+#
+# Normal commits do not deploy Pages. Change this file to trigger a Pages
+# deployment from the current iframe-workspace branch.
+#
+# Example values can be a timestamp, note, or arbitrary nonce.
+trigger: initial
