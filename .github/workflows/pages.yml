@@ -34,6 +34,12 @@ jobs:
           cp index.html workspace.css workspace.js _site/
           cp app/app.html app/app_dark.html app/dark.css _site/app/
 
+          # GitHub Pages/CDN may cache static assets across deployments. Tie the
+          # document's CSS/JS URLs to this exact commit so HTML and behavior can
+          # never come from different revisions.
+          sed -i "s|./workspace.css|./workspace.css?v=${GITHUB_SHA}|" _site/index.html
+          sed -i "s|./workspace.js|./workspace.js?v=${GITHUB_SHA}|" _site/index.html
+
       - name: Configure Pages
         uses: actions/configure-pages@v5
 
