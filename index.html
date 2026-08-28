@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; frame-src 'self' https:; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>Skibidi Workspace</title>
+  <link rel="stylesheet" href="./workspace.css">
+</head>
+<body>
+  <header class="toolbar">
+    <form class="pane-control" data-pane="left">
+      <label for="left-url">Left</label>
+      <input id="left-url" name="url" type="url" inputmode="url" autocomplete="off" spellcheck="false">
+      <button type="submit">Load</button>
+    </form>
+    <form class="pane-control" data-pane="right">
+      <label for="right-url">Right</label>
+      <input id="right-url" name="url" type="url" inputmode="url" autocomplete="off" spellcheck="false">
+      <button type="submit">Load</button>
+    </form>
+  </header>
+
+  <main id="workspace" class="workspace" aria-label="Split browser workspace">
+    <section class="pane">
+      <iframe id="left-frame" title="Left workspace" allow="autoplay; fullscreen; picture-in-picture; clipboard-read; clipboard-write"></iframe>
+    </section>
+    <div id="splitter" class="splitter" role="separator" aria-orientation="vertical" aria-label="Resize panes" tabindex="0"></div>
+    <section class="pane">
+      <iframe id="right-frame" title="Right workspace" allow="autoplay; fullscreen; picture-in-picture; clipboard-read; clipboard-write"></iframe>
+    </section>
+  </main>
+
+  <script src="./workspace.js" defer></script>
+</body>
+</html>
