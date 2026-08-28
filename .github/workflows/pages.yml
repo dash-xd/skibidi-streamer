@@ -25,13 +25,21 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
+      - name: Stage static site
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p _site/app
+          cp index.html workspace.css workspace.js _site/
+          cp app/app.html app/app_dark.html app/dark.css _site/app/
+
       - name: Configure Pages
         uses: actions/configure-pages@v5
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v4
         with:
-          path: .
+          path: _site
 
       - name: Deploy to GitHub Pages
         id: deployment
