@@ -29,7 +29,7 @@ body {
 
 .pane-control {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
   gap: 0.4rem;
   align-items: center;
   min-width: 0;
@@ -60,6 +60,11 @@ body {
   cursor: pointer;
 }
 
+.view-toggle[aria-pressed="true"] {
+  border-color: #8aa4c7;
+  background: #253247;
+}
+
 .workspace {
   --left: 50%;
   display: grid;
@@ -67,6 +72,22 @@ body {
   width: 100vw;
   min-height: 0;
   overflow: hidden;
+}
+
+.workspace[data-view="left"] {
+  grid-template-columns: minmax(0, 1fr) 0 0;
+}
+
+.workspace[data-view="right"] {
+  grid-template-columns: 0 0 minmax(0, 1fr);
+}
+
+.workspace[data-view="left"] #right-pane,
+.workspace[data-view="right"] #left-pane,
+.workspace[data-view="left"] .splitter,
+.workspace[data-view="right"] .splitter {
+  visibility: hidden;
+  pointer-events: none;
 }
 
 .pane {
@@ -119,6 +140,6 @@ body.dragging .splitter {
   }
 
   .pane-control {
-    grid-template-columns: 3rem minmax(0, 1fr) auto;
+    grid-template-columns: 3rem minmax(0, 1fr) auto auto;
   }
 }
