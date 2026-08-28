@@ -15,6 +15,9 @@ const externalSandbox = [
   "allow-same-origin",
   "allow-scripts"
 ].join(" ");
+const validViews = new Set(["split", "left", "right"]);
+let currentView = "split";
+let splitPercent = 50;
 
 function normalizeURL(value, fallback) {
   const url = new URL(value || fallback, window.location.href);
@@ -24,6 +27,12 @@ function normalizeURL(value, fallback) {
   }
 
   return url;
+}
+
+function replaceQueryParam(name, value) {
+  const params = new URLSearchParams(window.location.search);
+  params.set(name, value);
+  history.replaceState(null, "", `${window.location.pathname}?${params}${window.location.hash}`);
 }
 
 function applySameOriginTheme(frame, url) {
@@ -65,9 +74,31 @@ function loadPane(name, value, fallback, updateLocation = true) {
   input.value = url.href;
 
   if (updateLocation) {
-    const params = new URLSearchParams(window.location.search);
-    params.set(name, url.href);
-    history.replaceState(null, "", `${window.location.pathname}?${params}${window.location.hash}`);
+    replaceQueryParam(name, url.href);
+  }
+}
+
+function updateViewControls() {
+  for (const button of document.querySelectorAll(".view-toggle")) {
+    const active = currentView === button.dataset.view;
+    button.setAttribute("aria-pressed", String(active));
+    button.textContent = active ? "Restore" : "Expand";
+    button.title = active
+      ? "Restore split view"
+      : `Show only ${button.dataset.view} pane`;
+  }
+}
+
+function setView(view, updateLocation = true) {
+  currentView = validViews.has(view) ? view : "split";
+  workspace.dataset.view = currentView;
+  workspace.setAttribute("aria-label", currentView === "split"
+    ? "Split browser workspace"
+    : `${currentView === "left" ? "Left" : "Right"} browser workspace`);
+  updateViewControls();
+
+  if (updateLocation) {
+    replaceQueryParam("view", currentView);
   }
 }
 
@@ -85,18 +116,36 @@ for (const form of document.querySelectorAll(".pane-control")) {
   });
 }
 
+for (const button of document.querySelectorAll(".view-toggle")) {
+  button.addEventListener("click", () => {
+    setView(currentView === button.dataset.view ? "split" : button.dataset.view);
+  });
+}
+
 const initialParams = new URLSearchParams(window.location.search);
 loadPane("left", initialParams.get("left"), defaultLeft, false);
 loadPane("right", initialParams.get("right"), defaultRight, false);
+setView(initialParams.get("view") || "split", false);
+
+function applySplit(percent) {
+  splitPercent = Math.min(85, Math.max(15, percent));
+  workspace.style.setProperty("--left", `${splitPercent}%`);
+}
 
 function setSplit(clientX) {
+  if (currentView !== "split") {
+    return;
+  }
+
   const rect = workspace.getBoundingClientRect();
-  const percent = ((clientX - rect.left) / rect.width) * 100;
-  const clamped = Math.min(85, Math.max(15, percent));
-  workspace.style.setProperty("--left", `${clamped}%`);
+  applySplit(((clientX - rect.left) / rect.width) * 100);
 }
 
 splitter.addEventListener("pointerdown", event => {
+  if (currentView !== "split") {
+    return;
+  }
+
   splitter.setPointerCapture(event.pointerId);
   document.body.classList.add("dragging");
   setSplit(event.clientX);
@@ -120,13 +169,15 @@ splitter.addEventListener("pointercancel", () => {
 });
 
 splitter.addEventListener("keydown", event => {
-  const current = Number.parseFloat(getComputedStyle(workspace).getPropertyValue("--left")) || 50;
+  if (currentView !== "split") {
+    return;
+  }
 
   if (event.key === "ArrowLeft") {
-    workspace.style.setProperty("--left", `${Math.max(15, current - 2)}%`);
+    applySplit(splitPercent - 2);
     event.preventDefault();
   } else if (event.key === "ArrowRight") {
-    workspace.style.setProperty("--left", `${Math.min(85, current + 2)}%`);
+    applySplit(splitPercent + 2);
     event.preventDefault();
   }
 });
